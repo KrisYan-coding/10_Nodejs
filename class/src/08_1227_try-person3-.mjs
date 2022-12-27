@@ -1,5 +1,5 @@
 
-import Person, { f2, f3 } from './Person3.mjs';
+import Person, { f2, f3 } from './07_1227_Person3.mjs';
 
 const p1 = new Person('Kris', 25);
 
