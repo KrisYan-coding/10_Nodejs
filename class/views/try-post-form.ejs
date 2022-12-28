@@ -1,0 +1,26 @@
+<%- include('parts/html-head.ejs') %>
+<%- include('parts/html-navbar.ejs') %>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <form name="form1" method="post">
+                <div class="mb-3">
+                    <label for="account" class="form-label">account</label>
+                    <input type="text" name="account" class="form-control" id="account">
+                    <div class="info"><%= typeof account==='undefined' ? '' : account %> </div>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" id="password">
+                    <div class="info"><%= locals.password ? password : '' %> </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<%- include('parts/html-scripts.ejs') %>
+<%- include('parts/html-foot.ejs') %>

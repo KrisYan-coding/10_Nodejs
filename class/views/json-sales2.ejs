@@ -1,0 +1,41 @@
+<%- include('parts/html-head.ejs') %>
+<%- include('parts/html-navbar.ejs') %>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <% for(let k in handleObj){
+                const style = (orderby===k) ? 'btn-primary' : 'btn-outline-primary'; %> 
+                <a class="btn <%= style %>" href="?orderby=<%= k %>">
+                    <%= handleObj[k].label %> 
+                </a>
+            <% } %> 
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">編號</th>
+                        <th scope="col">姓名</th>
+                        <th scope="col">年齡</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for(let s of data){ %> 
+                    <tr>
+                        <td><%= s.id %></td>
+                        <td><%= s.name %></td>
+                        <td><%= s.age %></td>
+                    </tr>
+                    <% } %> 
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<%- include('parts/html-scripts.ejs') %>
+<%- include('parts/html-foot.ejs') %>

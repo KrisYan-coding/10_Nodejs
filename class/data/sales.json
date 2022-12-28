@@ -1,6 +1,19 @@
 [
     {
+        "id": 1,
         "name": "kris",
         "age": 25
+    },
+
+    {
+        "id": 2,
+        "name": "john",
+        "age": 30
+    },
+
+    {
+        "id": 3,
+        "name": "mary",
+        "age": 28
     }
 ]
