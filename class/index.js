@@ -1,8 +1,15 @@
 
-require('dotenv').config();
+if (process.argv[2] === "production") {
+    require("dotenv").config({ path: __dirname + "/production.env" });
+} else {
+    require("dotenv").config({ path: __dirname + "/dev.env" });
+}
 
 const multer = require('multer');
 const upload = require('./modules/upload-img');
+const session = require('express-session');
+const moment = require('moment-timezone');
+const db = require('./modules/connect-mysql')
 
 const express = require('express');
 
@@ -11,8 +18,26 @@ const app = express();
 app.set('view engine', 'ejs');
 
 // middleware 處理送來的資料--
-app.use(express.urlencoded({extended: false}));
+app.use(session({
+    saveUninitialized: false,
+    resave: false,
+    secret: 'kjksjjiijfhhohfheuhcnnjhfo',
+    cookie: {
+        maxAge: 1200_000
+    }
+}))
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+app.use((req, res, next) => {
+    res.locals.title = process.env.SITE_TITLE || "*** 沒有設定 ***";
+
+    // 樣板輔助函式, helper functions
+    res.locals.toDataString = d => moment(d).format('YYYY-MM-DD');
+    res.locals.toDataTimeString = d => moment(d).format('YYYY-MM-DD HH:mm:ss');
+    
+    next();
+});
 
 // 路由設定, routes--
 app.get('/', (req, res) => {
@@ -57,7 +82,7 @@ app.get('/json-sales2', (req, res) => {
     };
 
     console.log('orderby', orderby);
-    
+
     if (handleObj[orderby]) {
         console.log('sort--');
         console.log(handleObj[orderby].sort);
@@ -98,15 +123,15 @@ app.get("/json-sales3", (req, res) => {
 });
 
 // --------------
-app.post(['/try-post', '/try-post2'],  (req, res) => {
+app.post(['/try-post', '/try-post2'], (req, res) => {
     res.json(req.body);
 });
 
 // --------------
-app.get('/try-post-form',  (req, res) => {
+app.get('/try-post-form', (req, res) => {
     res.render('try-post-form');
 });
-app.post('/try-post-form',  (req, res) => {
+app.post('/try-post-form', (req, res) => {
     res.render("try-post-form", req.body);
 });
 
@@ -139,7 +164,53 @@ app.get(/^\/m\/09\d{2}-?\d{3}-?\d{3}$/i, (req, res) => {
     res.json(u)
 })
 
+
+// 路由定義在其他檔案--
+app.use('/admins', require(__dirname + '/routes/admin2'));
+// --掛在 /admins 下
+// --預設掛在根目錄'/'下
+
+
+// --------------
+app.get('/try-session', (req, res) => {
+    req.session.my_var = req.session.my_var || 0;
+    req.session.my_var++;
+    res.json({
+        my_var: req.session.my_var,
+        session: req.session
+
+    })
+})
+
+
+// --------------
+app.get('/try-moment', (req, res) => {
+    const m1 = moment();  // new Date()
+    const m2 = moment('2023/01/02');  // new Date()
+    const m1a = m1.format('YYYY/MM+DD');
+    const m1b = m1.format('YYYY-MM-DD HH:mm:ss');
+    const m1c = m1.tz('Asia/Tokyo').format('YYYY-MM-DD HH:mm:ss');
+
+    const d1 = new Date();
+    // --標準時間
+
+    res.json({ m1, m2, m1a, m1b, m1c, d1 });
+})
+
+
+// --------------
+app.get('/try-db', async (req, res) => {
+    const [rows] = await db.query("SELECT * FROM categories");
+
+    res.json(rows);
+})
+
+app.use("/address-book", require('./routes/address-book'));
+
+
+// --------------
 app.use(express.static('public'));
+
 
 // ***** 所有的路由要放在這行之前 ***
 app.use('/', (req, res) => {
